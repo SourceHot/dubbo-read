@@ -1,6 +1,6 @@
-package com.sourcehot.dubbo.spi.impl;
+package org.sourcehot.dubbo.spi.impl;
 
-import com.sourcehot.dubbo.spi.SpiInterface;
+import org.sourcehot.dubbo.spi.SpiInterface;
 
 public class SecSpiInterfaceImpl implements SpiInterface {
   @Override

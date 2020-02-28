@@ -1,4 +1,4 @@
-package com.sourcehot.dubbo.spi;
+package org.sourcehot.dubbo.spi;
 
 /**
  * com.sourcehot.spi 接口

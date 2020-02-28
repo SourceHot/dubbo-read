@@ -1,4 +1,4 @@
-package com.sourcehot.dubbo.spi;
+package org.sourcehot.dubbo.spi;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
