@@ -92,10 +92,6 @@ public abstract class ServiceConfigBase<T> extends AbstractServiceConfig {
         setMethods(MethodConfig.constructMethodConfig(service.methods()));
     }
 
-    public void exported() {
-
-    }
-
     @Deprecated
     private static List<ProtocolConfig> convertProviderToProtocol(List<ProviderConfig> providers) {
         if (CollectionUtils.isEmpty(providers)) {
@@ -150,6 +146,10 @@ public abstract class ServiceConfigBase<T> extends AbstractServiceConfig {
         provider.setThreads(protocol.getThreads());
         provider.setParameters(protocol.getParameters());
         return provider;
+    }
+
+    public void exported() {
+
     }
 
     public boolean shouldExport() {
@@ -338,6 +338,11 @@ public abstract class ServiceConfigBase<T> extends AbstractServiceConfig {
         return interfaceName;
     }
 
+    /**
+     * 设置 接口类
+     *
+     * @param interfaceClass 接口类
+     */
     public void setInterface(Class<?> interfaceClass) {
         if (interfaceClass != null && !interfaceClass.isInterface()) {
             throw new IllegalStateException("The interface class " + interfaceClass + " is not a interface!");

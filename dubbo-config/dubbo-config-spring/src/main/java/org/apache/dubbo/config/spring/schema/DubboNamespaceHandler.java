@@ -56,6 +56,10 @@ public class DubboNamespaceHandler extends NamespaceHandlerSupport implements Co
         Version.checkDuplicate(DubboNamespaceHandler.class);
     }
 
+
+    /**
+     * dubbo bean信息注册
+     */
     @Override
     public void init() {
         registerBeanDefinitionParser("application", new DubboBeanDefinitionParser(ApplicationConfig.class, true));

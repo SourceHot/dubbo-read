@@ -55,19 +55,14 @@ import static org.apache.dubbo.registry.zookeeper.util.CuratorFrameworkUtils.bui
 public class ZookeeperServiceDiscovery implements ServiceDiscovery, EventListener<ServiceInstancesChangedEvent> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private EventDispatcher dispatcher;
-
-    private CuratorFramework curatorFramework;
-
-    private String rootPath;
-
-    private org.apache.curator.x.discovery.ServiceDiscovery<ZookeeperInstance> serviceDiscovery;
-
     /**
      * The Key is watched Zookeeper path, the value is an instance of {@link CuratorWatcher}
      */
     private final Map<String, CuratorWatcher> watcherCaches = new ConcurrentHashMap<>();
+    private EventDispatcher dispatcher;
+    private CuratorFramework curatorFramework;
+    private String rootPath;
+    private org.apache.curator.x.discovery.ServiceDiscovery<ZookeeperInstance> serviceDiscovery;
 
     @Override
     public void initialize(URL registryURL) throws Exception {
@@ -83,6 +78,12 @@ public class ZookeeperServiceDiscovery implements ServiceDiscovery, EventListene
         serviceDiscovery.close();
     }
 
+    /**
+     * 注冊
+     *
+     * @param serviceInstance an instance of {@link ServiceInstance} to be registered
+     * @throws RuntimeException
+     */
     public void register(ServiceInstance serviceInstance) throws RuntimeException {
         doInServiceRegistry(serviceDiscovery -> {
             serviceDiscovery.registerService(build(serviceInstance));

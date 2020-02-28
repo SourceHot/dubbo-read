@@ -209,10 +209,13 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     private void checkAndUpdateSubConfigs() {
         // Use default configs defined explicitly with global scope
         completeCompoundConfigs();
+        // 校验默认值
         checkDefault();
+        // 校验 Protocol
         checkProtocol();
         // if protocol is not injvm checkRegistry
         if (!isOnlyInJvm()) {
+            // 校验注册
             checkRegistry();
         }
         this.refresh();

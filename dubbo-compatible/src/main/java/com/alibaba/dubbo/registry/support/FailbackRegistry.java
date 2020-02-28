@@ -106,6 +106,11 @@ public abstract class FailbackRegistry implements org.apache.dubbo.registry.Regi
 
     // ==== Template method ====
 
+    /**
+     * 执行注册,子类实现
+     *
+     * @param url
+     */
     public abstract void doRegister(URL url);
 
     public abstract void doUnregister(URL url);

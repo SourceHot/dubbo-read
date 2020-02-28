@@ -99,6 +99,9 @@ public class FastJsonObjectInput implements ObjectInput {
         return read(cls);
     }
 
+    /**
+     * 读取对象
+     */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T readObject(Class<T> cls, Type type) throws IOException, ClassNotFoundException {
@@ -106,7 +109,7 @@ public class FastJsonObjectInput implements ObjectInput {
         return (T) JSON.parseObject(json, type);
     }
 
-    private String readLine() throws IOException, EOFException {
+    private String readLine() throws IOException {
         String line = reader.readLine();
         if (line == null || line.trim().length() == 0) {
             throw new EOFException();
@@ -115,7 +118,9 @@ public class FastJsonObjectInput implements ObjectInput {
     }
 
     private <T> T read(Class<T> cls) throws IOException {
-        String json = readLine();
-        return JSON.parseObject(json, cls);
+             // 读取json字符串
+   String json = readLine();
+              // 反序列化json成对象
+  return JSON.parseObject(json, cls);
     }
 }

@@ -161,6 +161,9 @@ public class ApplicationConfig extends AbstractConfig {
     public ApplicationConfig() {
     }
 
+    /**
+     * @param name 项目名
+     */
     public ApplicationConfig(String name) {
         setName(name);
     }

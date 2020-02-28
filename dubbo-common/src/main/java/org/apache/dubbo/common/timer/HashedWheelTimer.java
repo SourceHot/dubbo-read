@@ -80,7 +80,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HashedWheelTimer implements Timer {
 
     /**
-     * may be in spi?
+     * may be in com.sourcehot.spi?
      */
     public static final String NAME = "hased";
 

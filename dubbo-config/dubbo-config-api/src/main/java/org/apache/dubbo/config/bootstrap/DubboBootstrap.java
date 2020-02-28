@@ -503,6 +503,7 @@ public class DubboBootstrap extends GenericEventListener {
 
         ApplicationModel.iniFrameworkExts();
 
+        // 配置中心启动
         startConfigCenter();
 
         useRegistryAsConfigCenterIfNecessary();

@@ -35,21 +35,14 @@ import java.util.concurrent.Executor;
 public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildListener> implements ZookeeperClient {
 
     protected static final Logger logger = LoggerFactory.getLogger(AbstractZookeeperClient.class);
-
+    private final URL url;
+    private final Set<StateListener> stateListeners = new CopyOnWriteArraySet<StateListener>();
+    private final ConcurrentMap<String, ConcurrentMap<ChildListener, TargetChildListener>> childListeners = new ConcurrentHashMap<String, ConcurrentMap<ChildListener, TargetChildListener>>();
+    private final ConcurrentMap<String, ConcurrentMap<DataListener, TargetDataListener>> listeners = new ConcurrentHashMap<String, ConcurrentMap<DataListener, TargetDataListener>>();
+    private final Set<String> persistentExistNodePath = new ConcurrentHashSet<>();
     protected int DEFAULT_CONNECTION_TIMEOUT_MS = 5 * 1000;
     protected int DEFAULT_SESSION_TIMEOUT_MS = 60 * 1000;
-
-    private final URL url;
-
-    private final Set<StateListener> stateListeners = new CopyOnWriteArraySet<StateListener>();
-
-    private final ConcurrentMap<String, ConcurrentMap<ChildListener, TargetChildListener>> childListeners = new ConcurrentHashMap<String, ConcurrentMap<ChildListener, TargetChildListener>>();
-
-    private final ConcurrentMap<String, ConcurrentMap<DataListener, TargetDataListener>> listeners = new ConcurrentHashMap<String, ConcurrentMap<DataListener, TargetDataListener>>();
-
     private volatile boolean closed = false;
-
-    private final Set<String>  persistentExistNodePath = new ConcurrentHashSet<>();
 
     public AbstractZookeeperClient(URL url) {
         this.url = url;
@@ -61,17 +54,23 @@ public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildLis
     }
 
     @Override
-    public void delete(String path){
+    public void delete(String path) {
         //never mind if ephemeral
         persistentExistNodePath.remove(path);
         deletePath(path);
     }
 
 
+    /**
+     * zookeeper 注册节点
+     *
+     * @param path
+     * @param ephemeral
+     */
     @Override
     public void create(String path, boolean ephemeral) {
         if (!ephemeral) {
-            if(persistentExistNodePath.contains(path)){
+            if (persistentExistNodePath.contains(path)) {
                 return;
             }
             if (checkExists(path)) {
@@ -141,11 +140,11 @@ public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildLis
     }
 
     @Override
-    public void removeDataListener(String path, DataListener listener ){
+    public void removeDataListener(String path, DataListener listener) {
         ConcurrentMap<DataListener, TargetDataListener> dataListenerMap = listeners.get(path);
         if (dataListenerMap != null) {
             TargetDataListener targetListener = dataListenerMap.remove(listener);
-            if(targetListener != null){
+            if (targetListener != null) {
                 removeTargetDataListener(path, targetListener);
             }
         }
@@ -235,6 +234,7 @@ public abstract class AbstractZookeeperClient<TargetDataListener, TargetChildLis
 
     /**
      * we invoke the zookeeper client to delete the node
+     *
      * @param path the node path
      */
     protected abstract void deletePath(String path);

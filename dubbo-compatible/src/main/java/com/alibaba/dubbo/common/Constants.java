@@ -23,6 +23,9 @@ import org.apache.dubbo.common.constants.QosConstants;
 import org.apache.dubbo.common.constants.RegistryConstants;
 import org.apache.dubbo.common.constants.RemotingConstants;
 
+/**
+ * 常量 , 类废弃了
+ */
 @Deprecated
 public class Constants implements CommonConstants,
         QosConstants,
