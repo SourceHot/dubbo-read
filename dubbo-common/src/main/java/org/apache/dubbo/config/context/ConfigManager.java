@@ -384,6 +384,11 @@ public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
         addConfig(config, false);
     }
 
+    /**
+     * 添加配置信息
+     * @param config
+     * @param unique
+     */
     protected void addConfig(AbstractConfig config, boolean unique) {
         if (config == null) {
             return;

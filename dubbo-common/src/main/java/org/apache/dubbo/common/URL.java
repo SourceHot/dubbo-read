@@ -84,7 +84,7 @@ import static org.apache.dubbo.common.constants.CommonConstants.VERSION_KEY;
  * for this case, url protocol = null, url host = home, url path = user1/router.js
  * </ul>
  *
- * @see java.net.URL
+ * @see java.net.URLgi
  * @see java.net.URI
  */
 public /*final**/

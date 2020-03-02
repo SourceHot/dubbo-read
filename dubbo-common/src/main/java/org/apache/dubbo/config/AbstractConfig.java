@@ -79,13 +79,12 @@ public abstract class AbstractConfig implements Serializable {
         LEGACY_PROPERTIES.put("dubbo.service.url", "dubbo.service.address");
     }
 
+    protected final AtomicBoolean refreshed = new AtomicBoolean(false);
     /**
      * The config id
      */
     protected String id;
     protected String prefix;
-
-    protected final AtomicBoolean refreshed = new AtomicBoolean(false);
 
     private static String convertLegacyValue(String key, String value) {
         if (value != null && value.length() > 0) {
@@ -556,8 +555,8 @@ public abstract class AbstractConfig implements Serializable {
                 }
                 try {
                     Method method2 = obj.getClass().getMethod(method1.getName(), method1.getParameterTypes());
-                    Object value1 = method1.invoke(this, new Object[]{});
-                    Object value2 = method2.invoke(obj, new Object[]{});
+                    Object value1 = method1.invoke(this);
+                    Object value2 = method2.invoke(obj);
                     if (!Objects.equals(value1, value2)) {
                         return false;
                     }
@@ -573,6 +572,8 @@ public abstract class AbstractConfig implements Serializable {
      * Add {@link AbstractConfig instance} into {@link ConfigManager}
      * <p>
      * Current method will invoked by Spring or Java EE container automatically, or should be triggered manually.
+     * <p>
+     * 将{@link AbstractConfig}信息插入到{@link ConfigManager}
      *
      * @see ConfigManager#addConfig(AbstractConfig)
      * @since 2.7.5
