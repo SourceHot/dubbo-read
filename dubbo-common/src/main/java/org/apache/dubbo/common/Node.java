@@ -23,7 +23,7 @@ public interface Node {
 
     /**
      * get url.
-     *
+     * 获取url地址信息,节点信息
      * @return url.
      */
     URL getUrl();

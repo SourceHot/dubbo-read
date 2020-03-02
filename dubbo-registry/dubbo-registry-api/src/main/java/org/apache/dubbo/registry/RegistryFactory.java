@@ -23,6 +23,7 @@ import org.apache.dubbo.common.extension.SPI;
 /**
  * RegistryFactory. (SPI, Singleton, ThreadSafe)
  *
+ * 注册器工厂
  * @see org.apache.dubbo.registry.support.AbstractRegistryFactory
  */
 @SPI("dubbo")
@@ -39,6 +40,7 @@ public interface RegistryFactory {
      * 5. Support the timeout=1000 request timeout setting.<br>
      * 6. Support session=60000 session timeout or expiration settings.<br>
      *
+     * 获取{@link Registry}
      * @param url Registry address, is not allowed to be empty
      * @return Registry reference, never return empty value
      */

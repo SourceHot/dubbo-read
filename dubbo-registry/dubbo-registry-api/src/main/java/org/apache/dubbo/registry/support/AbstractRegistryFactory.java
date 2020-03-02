@@ -50,89 +50,14 @@ public abstract class AbstractRegistryFactory implements RegistryFactory {
     // The lock for the acquisition process of the registry
     private static final ReentrantLock LOCK = new ReentrantLock();
 
-    // Registry Collection Map<RegistryAddress, Registry>
+    /**
+     * Registry Collection Map<RegistryAddress, Registry>
+     * <p>
+     * key: 注册中心地址,value: {@link Registry}
+     */
     private static final Map<String, Registry> REGISTRIES = new HashMap<>();
 
     private static final AtomicBoolean destroyed = new AtomicBoolean(false);
-
-    /**
-     * Get all registries
-     *
-     * @return all registries
-     */
-    public static Collection<Registry> getRegistries() {
-        return Collections.unmodifiableCollection(REGISTRIES.values());
-    }
-
-    public static Registry getRegistry(String key) {
-        return REGISTRIES.get(key);
-    }
-
-    /**
-     * Close all created registries
-     */
-    public static void destroyAll() {
-        if (!destroyed.compareAndSet(false, true)) {
-            return;
-        }
-
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Close all registries " + getRegistries());
-        }
-        // Lock up the registry shutdown process
-        LOCK.lock();
-        try {
-            for (Registry registry : getRegistries()) {
-                try {
-                    registry.destroy();
-                } catch (Throwable e) {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-            REGISTRIES.clear();
-        } finally {
-            // Release the lock
-            LOCK.unlock();
-        }
-    }
-
-    @Override
-    public Registry getRegistry(URL url) {
-        if (destroyed.get()) {
-            LOGGER.warn("All registry instances have been destroyed, failed to fetch any instance. " +
-                    "Usually, this means no need to try to do unnecessary redundant resource clearance, all registries has been taken care of.");
-            return DEFAULT_NOP_REGISTRY;
-        }
-
-        url = URLBuilder.from(url)
-                .setPath(RegistryService.class.getName())
-                .addParameter(INTERFACE_KEY, RegistryService.class.getName())
-                .removeParameters(EXPORT_KEY, REFER_KEY)
-                .build();
-        String key = url.toServiceStringWithoutResolving();
-        // Lock the registry access process to ensure a single instance of the registry
-        LOCK.lock();
-        try {
-            Registry registry = REGISTRIES.get(key);
-            if (registry != null) {
-                return registry;
-            }
-            //create registry by com.sourcehot.spi/ioc
-            registry = createRegistry(url);
-            if (registry == null) {
-                throw new IllegalStateException("Can not create registry " + url);
-            }
-            REGISTRIES.put(key, registry);
-            return registry;
-        } finally {
-            // Release the lock
-            LOCK.unlock();
-        }
-    }
-
-    protected abstract Registry createRegistry(URL url);
-
-
     private static Registry DEFAULT_NOP_REGISTRY = new Registry() {
         @Override
         public URL getUrl() {
@@ -175,9 +100,93 @@ public abstract class AbstractRegistryFactory implements RegistryFactory {
         }
     };
 
+    /**
+     * Get all registries
+     *
+     * @return all registries
+     */
+    public static Collection<Registry> getRegistries() {
+        return Collections.unmodifiableCollection(REGISTRIES.values());
+    }
+
+    public static Registry getRegistry(String key) {
+        return REGISTRIES.get(key);
+    }
+
+    /**
+     * Close all created registries
+     */
+    public static void destroyAll() {
+        if (!destroyed.compareAndSet(false, true)) {
+            return;
+        }
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Close all registries " + getRegistries());
+        }
+        // Lock up the registry shutdown process
+        LOCK.lock();
+        try {
+            for (Registry registry : getRegistries()) {
+                try {
+                    registry.destroy();
+                } catch (Throwable e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+            REGISTRIES.clear();
+        } finally {
+            // Release the lock
+            LOCK.unlock();
+        }
+    }
+
     // for unit test
     public static void clearRegistryNotDestroy() {
         REGISTRIES.clear();
     }
+
+    @Override
+    public Registry getRegistry(URL url) {
+        if (destroyed.get()) {
+            LOGGER.warn("All registry instances have been destroyed, failed to fetch any instance. " +
+                    "Usually, this means no need to try to do unnecessary redundant resource clearance, all registries has been taken care of.");
+            return DEFAULT_NOP_REGISTRY;
+        }
+
+        url = URLBuilder.from(url)
+                .setPath(RegistryService.class.getName())
+                .addParameter(INTERFACE_KEY, RegistryService.class.getName())
+                .removeParameters(EXPORT_KEY, REFER_KEY)
+                .build();
+        String key = url.toServiceStringWithoutResolving();
+        // Lock the registry access process to ensure a single instance of the registry
+        LOCK.lock();
+        try {
+            Registry registry = REGISTRIES.get(key);
+            if (registry != null) {
+                return registry;
+            }
+            //create registry by com.sourcehot.spi/ioc
+            /**
+             * 创建注册器,多个实现
+             * {@link org.apache.dubbo.registry.zookeeper.ZookeeperRegistryFactory#createRegistry(org.apache.dubbo.common.URL)}
+             * {@link org.apache.dubbo.registry.multicast.MulticastRegistryFactory#createRegistry(org.apache.dubbo.common.URL)}
+             *
+             */
+            registry = createRegistry(url);
+            if (registry == null) {
+                throw new IllegalStateException("Can not create registry " + url);
+            }
+            REGISTRIES.put(key, registry);
+            return registry;
+        } finally {
+            // Release the lock
+            LOCK.unlock();
+        }
+    }
+
+    protected abstract Registry createRegistry(URL url);
+
 
 }

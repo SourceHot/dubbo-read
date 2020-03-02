@@ -21,6 +21,8 @@ import org.apache.dubbo.common.URL;
 
 /**
  * Registry. (SPI, Prototype, ThreadSafe)
+ * <p>
+ * 注册接口,主要由{@link Node},{@link RegistryService},其中 {@link Node} 负责数据,{@link RegistryService} 负责行为
  *
  * @see org.apache.dubbo.registry.RegistryFactory#getRegistry(URL)
  * @see org.apache.dubbo.registry.support.AbstractRegistry

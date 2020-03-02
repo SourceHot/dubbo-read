@@ -97,6 +97,7 @@ public class MulticastRegistry extends FailbackRegistry {
         }
         try {
             multicastAddress = InetAddress.getByName(url.getHost());
+            // 地址校验
             checkMulticastAddress(multicastAddress);
 
             multicastPort = url.getPort() <= 0 ? DEFAULT_MULTICAST_PORT : url.getPort();

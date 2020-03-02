@@ -69,32 +69,60 @@ import static org.apache.dubbo.registry.Constants.REGISTRY_FILESAVE_SYNC_KEY;
  */
 public abstract class AbstractRegistry implements Registry {
 
-    // URL address separator, used in file cache, service provider URL separation
+    /**
+     * URL address separator, used in file cache, service provider URL separation
+     * URL 地址分隔符
+     */
     private static final char URL_SEPARATOR = ' ';
-    // URL address separated regular expression for parsing the service provider URL list in the file cache
+    /**
+     * URL address separated regular expression for parsing the service provider URL list in the file cache
+     * URL 地址分隔符的正则表达式
+     */
     private static final String URL_SPLIT = "\\s+";
     // Max times to retry to save properties to local cache file
     private static final int MAX_RETRY_TIMES_SAVE_PROPERTIES = 3;
     // Log output
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    // Local disk cache, where the special key value.registries records the list of registry centers, and the others are the list of notified service providers
+    /**
+     * Local disk cache, where the special key value.registries records the list of registry centers, and the others are the list of notified service providers
+     * 本地缓存
+     */
     private final Properties properties = new Properties();
-    // File cache timing writing
+    //
+    /**
+     * File cache timing writing
+     * <p>
+     * 缓存注册,执行服务
+     */
     private final ExecutorService registryCacheExecutor = Executors.newFixedThreadPool(1, new NamedThreadFactory("DubboSaveRegistryCache", true));
-    // Is it synchronized to save the file
+    /**
+     * Is it synchronized to save the file
+     * 同步保存文件标识
+     */
     private final boolean syncSaveFile;
     private final AtomicLong lastCacheChanged = new AtomicLong();
     private final AtomicInteger savePropertiesRetryTimes = new AtomicInteger();
+    /**
+     * 已经完成注册的url
+     */
     private final Set<URL> registered = new ConcurrentHashSet<>();
+    /**
+     * 订阅关系
+     */
     private final ConcurrentMap<URL, Set<NotifyListener>> subscribed = new ConcurrentHashMap<>();
     private final ConcurrentMap<URL, Map<String, List<URL>>> notified = new ConcurrentHashMap<>();
+    /**
+     * 注册中心的URL
+     */
     private URL registryUrl;
     // Local disk cache file
     private File file;
 
     public AbstractRegistry(URL url) {
+        // 设置注册中心的url
         setUrl(url);
         // Start file save timer
+        // 从URL 中获取是否同步保存文件的参数,默认false
         syncSaveFile = url.getParameter(REGISTRY_FILESAVE_SYNC_KEY, false);
         String defaultFilename = System.getProperty("user.home") + "/.dubbo/dubbo-registry-" + url.getParameter(APPLICATION_KEY) + "-" + url.getAddress().replaceAll(":", "-") + ".cache";
         String filename = url.getParameter(FILE_KEY, defaultFilename);
@@ -128,6 +156,10 @@ public abstract class AbstractRegistry implements Registry {
         return registryUrl;
     }
 
+    /**
+     * 设置注册中心的url
+     * @param url
+     */
     protected void setUrl(URL url) {
         if (url == null) {
             throw new IllegalArgumentException("registry url == null");
@@ -284,6 +316,7 @@ public abstract class AbstractRegistry implements Registry {
         if (logger.isInfoEnabled()) {
             logger.info("Register: " + url);
         }
+        // 将url放入已经注册的列表中
         registered.add(url);
     }
 
@@ -427,6 +460,11 @@ public abstract class AbstractRegistry implements Registry {
         }
     }
 
+    /**
+     * 将这个url的数据信息设置到 {@link AbstractRegistry#properties}
+     *
+     * @param url
+     */
     private void saveProperties(URL url) {
         if (file == null) {
             return;
@@ -445,6 +483,7 @@ public abstract class AbstractRegistry implements Registry {
                     }
                 }
             }
+            // 本地缓存更新
             properties.setProperty(url.getServiceKey(), buf.toString());
             long version = lastCacheChanged.incrementAndGet();
             if (syncSaveFile) {
