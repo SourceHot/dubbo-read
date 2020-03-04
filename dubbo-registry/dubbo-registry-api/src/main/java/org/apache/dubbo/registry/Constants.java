@@ -17,6 +17,9 @@
 
 package org.apache.dubbo.registry;
 
+/**
+ * 常量
+ */
 public interface Constants {
     String REGISTER_IP_KEY = "register.ip";
 
